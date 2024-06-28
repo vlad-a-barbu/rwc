@@ -1,0 +1,36 @@
+<script>
+  const [count, setCount] = signal(0)
+
+  const btn = querySelector("button")
+  btn.addEventListener("click", () => setCount(count() + 1))
+
+  effect(() => {
+    btn.innerText = count()
+  })
+
+  const tripled = derived(() => count() * 3)
+
+  effect(() => {
+    console.log(`tripled = ${tripled()}`)
+  })
+</script>
+
+<template>
+  <button></button>
+</template>
+
+<style>
+  button {
+    height: 300px;
+    width: 300px;
+    background-color: rgb(158, 45, 45);
+    color: white;
+    font-size: 64px;
+    border: 0;
+    border-radius: 200px;
+    cursor: pointer;
+    &:hover {
+      background-color: rgb(169, 84, 84);
+    }
+  }
+</style>

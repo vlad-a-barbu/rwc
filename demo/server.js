@@ -2,7 +2,7 @@ import express from "express"
 
 const app = express()
 
-app.use(express.static("../pub"))
+app.use(express.static(path.resolve(import.meta.dirname, "../pub")))
 
 const port = 3000
 

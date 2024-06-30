@@ -14,10 +14,11 @@
     <script src="signals.js"></script>
     <script src="components.js"></script>
     <script>
-      window.onload = async function () {
-        await loadComponents("components/registry.json")
-        mount("#app", "app-counter")
-      }
+      window.onload = createApp(
+        "components/registry.json",
+        "#app",
+        "app-counter"
+      )
     </script>
   </head>
   <body>

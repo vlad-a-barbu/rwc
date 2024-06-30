@@ -1,22 +1,11 @@
 <script>
   const [count, setCount] = signal(0)
 
-  const btn = querySelector("button")
-  btn.addEventListener("click", () => setCount(count() + 1))
-
-  effect(() => {
-    btn.innerText = count()
-  })
-
-  const tripled = derived(() => count() * 3)
-
-  effect(() => {
-    console.log(`tripled = ${tripled()}`)
-  })
+  const increment = () => setCount((x) => x + 1)
 </script>
 
 <template>
-  <button></button>
+  <button r-click="increment()" r-content="count()"></button>
 </template>
 
 <style>

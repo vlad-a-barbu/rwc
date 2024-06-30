@@ -1,8 +1,13 @@
 const components = new Map()
 
-function mount(selector, rootComponent) {
+async function createApp(registryHref, rootSelector, rootComponent) {
+  await loadComponents(registryHref)
+  mount(rootSelector, rootComponent)
+}
+
+function mount(selector, componentName) {
   const container = document.querySelector(selector)
-  const component = components.get(rootComponent)
+  const component = components.get(componentName)
   container.innerHTML = component.tag
 }
 
@@ -30,20 +35,43 @@ async function loadComponent(href) {
     }
 
     connectedCallback() {
-      if (component.script) {
-        const scriptElement = document.createElement("script")
-        scriptElement.textContent = `
+      if (!component.script) {
+        return
+      }
+
+      const scriptElement = document.createElement("script")
+      scriptElement.textContent = `
           function querySelector(selector) {
             return document.querySelector("${component.name}").shadowRoot.querySelector(selector);
           }
           ${component.script.innerText}
         `
-        this.shadowRoot.appendChild(scriptElement)
-      }
+      this.shadowRoot.appendChild(scriptElement)
+      compileAttributes(this.shadowRoot)
     }
   }
+
   customElements.define(component.name, componentClass)
   components.set(component.name, component)
+}
+
+function compileAttributes(root) {
+  root.querySelectorAll("[r-click]").forEach((x) => {
+    x.addEventListener("click", new Function(x.getAttribute("r-click")))
+  })
+  let id = 0
+  root.querySelectorAll("[r-content]").forEach((x) => {
+    x.setAttribute("r-id", ++id)
+    const content = x.getAttribute("r-content")
+    const effectScript = `
+      effect(() => {
+        querySelector("[r-id='${id}']").innerText = new Function("return ${content}")()
+      });
+    `
+    const scriptElement = document.createElement("script")
+    scriptElement.textContent = effectScript
+    root.appendChild(scriptElement)
+  })
 }
 
 async function parseComponent(href) {

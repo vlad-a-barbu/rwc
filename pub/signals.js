@@ -5,19 +5,18 @@ function signal(initial) {
     value: initial,
     subscribers: new Set(),
   }
-  return [
-    () => {
-      if (subscriber) {
-        state.subscribers.add(subscriber)
-      }
-      return state.value
-    },
-    (newVal) => {
-      if (state.value === newVal) return
-      state.value = newVal
-      state.subscribers.forEach((sub) => sub())
-    },
-  ]
+  const get = () => {
+    if (subscriber) {
+      state.subscribers.add(subscriber)
+    }
+    return state.value
+  }
+  const set = (newVal) => {
+    if (state.value === newVal) return
+    state.value = typeof newVal === "function" ? newVal(state.value) : newVal
+    state.subscribers.forEach((sub) => sub())
+  }
+  return [get, set]
 }
 
 function effect(fn) {
